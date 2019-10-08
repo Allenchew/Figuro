@@ -3,13 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class movingBack : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
+    //背景の移動
 	void Update () {
         transform.localPosition += new Vector3(0,0.8f,0);
         if (transform.localPosition.y > 1210)

@@ -2,23 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class JoyStick : MonoBehaviour {
     [System.NonSerialized]
     public Camera cam;
     private bool triggered = false;
     private Vector3 Orgpos;
-	// Use this for initialization
+
 	void Start () {
         cam = Camera.main;
         Orgpos = transform.position;
 	}
 	
-	// Update is called once per frame
 	void Update () {
      /*   if (triggered)
         {
             transform.position = Vector3.Lerp(transform.position,Orgpos + Vector3.Normalize(Input.mousePosition - transform.position)*25,Time.deltaTime*10);
-
         }
         else
         {

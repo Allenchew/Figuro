@@ -4,16 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Reset : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    //ゲームリセット、タイトルに戻る
     public void ClickedButton()
     {
         var GM = GameObject.Find("MapLoader");

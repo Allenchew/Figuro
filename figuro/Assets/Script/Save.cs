@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//データを保存する容器を作る
 [System.Serializable]
 public class Save{
     public List<float[]> ObjectPos = new List<float[]>();

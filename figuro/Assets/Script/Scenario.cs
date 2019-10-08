@@ -39,8 +39,7 @@ public class Scenario : MonoBehaviour {
         }
         
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
@@ -50,46 +49,4 @@ public class Scenario : MonoBehaviour {
             FlowSpeed = 0.1f;
         }
 	}
-   /* IEnumerator OutPutChat()
-    {
-        for(int i = 0; i < 3; i++)
-        {
-            if (i == 1)
-            {
-                StartCoroutine("testzoom");
-            }
-            foreach (char A in test1[i])
-            {
-                chatbox1.text += A;
-                yield return new WaitForSeconds(FlowSpeed);
-            }
-            yield return new WaitForSeconds(FlowSpeed*10);
-            chatbox1.text = "";
-        }
-       
-        gameObject.SetActive(false);
-    }
-    IEnumerator testzoom()
-    {
-            for (int i = 0; i < 20; i++)
-            {
-                cam.orthographicSize = Mathf.Lerp(11, 5, (float)i / 20);
-                StgCam.orthographicSize = Mathf.Lerp(11, 5, (float)i / 20);
-                StgCam2.orthographicSize = Mathf.Lerp(11, 5, (float)i / 20);
-            cam.transform.position += new Vector3(0.1f, 0, -0.1f);
-            yield return new WaitForSeconds(0.04f);
-            }
-            
-        yield return new WaitForSeconds(1.0f);
-        MapLoader.Instance.startMov = true;
-        for (int i = 20; i >0; i--)
-        {
-            cam.orthographicSize = Mathf.Lerp(11, 5, (float)i / 20);
-            StgCam.orthographicSize = Mathf.Lerp(11, 5, (float)i / 20);
-            StgCam2.orthographicSize = Mathf.Lerp(11, 5, (float)i / 20);
-            cam.transform.position -= new Vector3(0.1f, 0, -0.1f);
-            yield return new WaitForSeconds(0.04f);
-        }
-
-    }*/
 }

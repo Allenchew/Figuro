@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//ステージの移動踏み場の処理
 public class MovingPlatform : MonoBehaviour {
     private float stepper = 0.1f;
     private float reverser = -1;
     private bool Stopper = false;
     private bool Running = false;
     private bool PlayedSound = false;
-	// Use this for initialization
+
 	void Start () {
 		if(MapLoader.Instance.StagesNum != 2)
         {
@@ -16,7 +17,6 @@ public class MovingPlatform : MonoBehaviour {
         }
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if(!Stopper &&(MapLoader.Instance.SwitchTwo == false && !Running))
         {

@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class UIButton : MonoBehaviour {
 
+    //UIボタンの処理
 	public void RestartButton()
     {
         MapLoader.Instance.ResetState();

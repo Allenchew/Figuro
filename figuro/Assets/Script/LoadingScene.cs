@@ -7,16 +7,11 @@ public class LoadingScene : MonoBehaviour {
     AsyncOperation Nowloading;
     public Image Progressbar;
     private const float LoadingMax = 0.9f;
-	// Use this for initialization
+
 	void Start () {
         StartCoroutine("Loading");
-        
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
     IEnumerator Loading()
     {
         yield return new WaitForSeconds(1f);

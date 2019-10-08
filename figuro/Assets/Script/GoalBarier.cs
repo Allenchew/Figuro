@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//ゴールの処理
 public class GoalBarier : MonoBehaviour {
     private int stages = 0;
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
+
 	void Update () {
 		if(stages ==0 && MapLoader.Instance.SwitchOne == true)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 
+//マップのフラグの初期化
 public class MapLoader : MonoBehaviour {
     public static MapLoader Instance;
     public bool startMov = false;
@@ -42,10 +43,7 @@ public class MapLoader : MonoBehaviour {
             Destroy(Instance);
         }
     }
-    // Use this for initialization
-    void Start () {
-		
-	}
+
     public void ResetState()
     {
         MapLoader.Instance.Rewind = false;
@@ -60,9 +58,4 @@ public class MapLoader : MonoBehaviour {
         MapMode = false;
     }
 	
-	// Update is called once per frame
-	void Update () {
-      
-	}
-  
 }

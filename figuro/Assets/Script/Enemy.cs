@@ -3,16 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    //敵の映る階層を変える
+    //不思議図形なので、敵をマップの上にあるように見せるため
     private void OnTriggerEnter(Collider other)
     {
         switch (other.tag)

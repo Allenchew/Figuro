@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//マップの編集機能
 public class AddItem : MonoBehaviour {
+    
     public int ItemNo = 1;
     public GameObject Items;
     public Vector3 AddBlockPos = new Vector3(0, 0, 0);
     private GameObject TempPos;
-	// Use this for initialization
-	void Start () {
-		
-	}
 	
-	// Update is called once per frame
+	//ナンバーで入れるキューブタイプを変える
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -34,6 +32,8 @@ public class AddItem : MonoBehaviour {
             ItemNo = 5;
         }
     }
+
+    //キューブの生成処理
     public void ClickedAddButton()
     {
         if (TempPos == null) TempPos = GameObject.Find("ObjectTempPos");

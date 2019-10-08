@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//罠の噴火処理
 public class OpenFire : MonoBehaviour {
 
     public float _coldDownTime = 0;

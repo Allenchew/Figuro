@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.UI;
 
+//作ったマップを保存する
 public class SaveFunction : MonoBehaviour {
     public static SaveFunction SaveAndLoad;
 
@@ -18,7 +19,7 @@ public class SaveFunction : MonoBehaviour {
     public Text debuglog;
 
     [System.NonSerialized]
-    public bool EditMode =false;
+    public bool EditMode =true;
 
     [System.NonSerialized]
     public Vector3[] TeleportTarget = new Vector3[]{ new Vector3(23, -13.8f, 25), new Vector3(24, -15.8f, 27),new Vector3(12,-22.8f,18),new Vector3(16,-26.8f,20),new Vector3(10,-26.8f,22),new Vector3(7,-22.8f,18), new Vector3(22, -22, 17)};

@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//マップ編集モードにマークを移動する処理
+//マークにある場所をキューブ入れて、マップを作る
 public class moving : MonoBehaviour {
     public GameObject MovingObject;
     private Camera cam;
 
     private bool MovingMode = false;
-    // Use this for initialization
+
     void Start () {
         gameObject.transform.GetComponent<CanvasGroup>().alpha = 0;
         cam = Camera.main;
     }
-	// Update is called once per frame
+
 	void Update () {
         if (MapLoader.Instance.EditorTrigger == true)
         {

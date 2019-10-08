@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//ステージ３の罠の処理
 public class TrapGimmic : MonoBehaviour {
     
     private bool MovedIn = false;
@@ -9,7 +10,7 @@ public class TrapGimmic : MonoBehaviour {
     private bool Movingtrap = false;
     private bool initialtrigger = false;
     public Material TrapB;
-    // Use this for initialization
+
     void Start () {
         if(gameObject.layer == 12)
         {
@@ -48,9 +49,7 @@ public class TrapGimmic : MonoBehaviour {
 	}
     IEnumerator MovingTrap(float MoveSide,float delaytime)
     {
-        /* if (gameObject.layer == 11 && !MovedIn)
-             yield return new WaitForSeconds(2f);*/
-        
+
         yield return new WaitForSeconds(delaytime-1);
         StartCoroutine("FlashTrap");
         yield return new WaitForSeconds(1f);

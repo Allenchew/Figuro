@@ -4,16 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LoadScene : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    //ステージ選択の処理
     public void LoadFirstStage()
     {
         SceneManager.LoadScene("LoadingScene");

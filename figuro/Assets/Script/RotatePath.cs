@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//回転通路の処理
 public class RotatePath : MonoBehaviour {
     private bool DoneRotateR = true;
     private bool DoneRotateL = true;

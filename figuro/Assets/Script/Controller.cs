@@ -4,16 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Controller : MonoBehaviour {
+
+    #region 初期化
+    #region 敵関連初期化
     public GameObject EnemyObj;
-    public GameObject[] TextImage = new GameObject[2];
-    public Rigidbody Prb;                                //Player Physics 
-    public GameObject JoyButton;                           //JoyStick as a button
-    public float DeadCamTime = 2;                           // Delay time for GameOver screen to show up
-    
+
     private List<Vector3[]> EnemyStartingPos = new List<Vector3[]>();       // use to store Enemy object starting position and location
     private List<Vector3[]> EnemyStartingRot = new List<Vector3[]>();
     private List<GameObject> SetEnemy = new List<GameObject>();               // use to contain cloned enemy object and apply position on it
-
     private List<int[][]> EnemyProcedure = new List<int[][]>{   new int [][] { new int[] {2, 0, 6, 1, 180 }},   //Use to set up Enemy Object moving procedure, index 0 stands for how many steps
                                                                 new int [][] { new int[] {12,0,3,1,90,0,8,1,90,0,3,1,180,0,3,1,-90,0,8,1,-90,0,3,1,180},new int[]{2,0,6,1,180} }, //odd number index refer to line 552-568
                                                                 new int [][] { new int[] {8,0,4,1,90,0,4,1,180,0,4,1,-90,0,4,1,180}, new int[] {4,0,7,1,-90,0,6,1,-90} }};// new int[]{Total Steps, 1st step, How much to move for 1st, 2nd Step,How much to move for 2nd, etc}
@@ -23,29 +21,39 @@ public class Controller : MonoBehaviour {
     private bool NewMove = false;           // Use to trigger Enemy sliding movement (scrap)>> trigger EnemyNewMove and start new moveset
     private bool EnemyNewMove = false;      // For Enemy object that will change their movement pattern
     private bool enemMoving = false;        // The animation that Enemy object move from a place to another place (moving or not)
-    private int DeathCount = 2;             // Chances for Player to respawn from stage 3 Trap Zone
+    private int EnemyCount; //Use to Set the number of enemies in stage
     private bool StepReverser = false;        //Use to reverse Enemy object movement (scrap)
+    #endregion
+    #region　その他の初期化
+    public GameObject[] TextImage = new GameObject[2];
+    public Rigidbody Prb;                                //Player Physics 
+    public GameObject JoyButton;
+    private Camera cam;//JoyStick as a button
+    
+    public float DeadCamTime = 2;                           // Delay time for GameOver screen to show up
+    private int stageNo; // Use to get which stage is loaded from MapLoader
+    private int DeathCount = 2;             // Chances for Player to respawn from stage 3 Trap Zone
+    private Vector3 JoyOrgpos;  // Use to record joystick original position
+    #endregion
+    #region 当たり判定の保存
     private bool[] AbleMovFront = { false, false, false, false }; // 2:forward 3:backward 1:Left 0:Right  Use to check if the direction is movable
-
     private bool[] OnSideCurve = { false, false, false, false };  // Use to mark if there is Curve movement in different direction
     private bool[] OnInvertCurve = { false, false, false, false }; //Use to mark if there is invert Curve movement in different direction
     private bool[] Upvector = { false, false, false, false };
+    #endregion
+    #region フラグ
     private bool StartTeleport = false; //Decide if player should change it's position
     private string TeleporterName = ""; // Decide which object's position Player should move to
-
-    private Camera cam;  
     private bool OnMoving = false; //Check if Player is moving Curve to next position
     private bool OnNormMove = false;//Check if Player is moving straight to next position
     private bool Death = false; // Mark if Player die
     private bool OnstayTrigger = false;  //Use to prevent OnStayTrigger function run more than once
     private bool Joytrigger = false; // If joystick is pressed
-    private int EnemyCount; //Use to Set the number of enemies in stage
-
-    private int stageNo; // Use to get which stage is loaded from MapLoader
-    private Vector3 JoyOrgpos;  // Use to record joystick original position
     private bool explodecontrol = false; // use to control Explode function to function differently
+    #endregion
+    
 
-
+    //マップ初期化
     void Start()
     {
         stageNo = MapLoader.Instance.StagesNum - 1;   // Read in Stage Number
@@ -69,9 +77,10 @@ public class Controller : MonoBehaviour {
         JoyOrgpos = JoyButton.transform.position; // Set joystick position
         EnemyGenerate(); // generate enemy from prefab Refers to Line 528-537
     }
-   
+    #endregion
+
     void Update() {
-       
+        //マップの爆発処理とプレイヤーの位置を再配置
         if (!explodecontrol &&( gameObject.transform.position.y <= 1.2f && !MapLoader.Instance.startMov && Prb.useGravity ))
         {
             transform.position = new Vector3(2, 1.2f,11); //Use to repositioning Player after falling in stage 2
@@ -80,107 +89,19 @@ public class Controller : MonoBehaviour {
             Prb.isKinematic = true;
             Prb.constraints = RigidbodyConstraints.None;
         }
-        if (!MapLoader.Instance.MapMode) // if is in Map mode
+        #region　プレイヤーを操作する
+        if (!MapLoader.Instance.MapMode) // if is not in Map mode
         {
             if (MapLoader.Instance._gameOver) // If player dies
             {
                 return;
             }
+            #region タブレットモード
             if (SaveFunction.SaveAndLoad.EditMode ==false) // if its not for pc editing mode
             {
                 if (Joytrigger) // if joystick pressed
                 {
-                    /*if(compareTouch.x < 0.5f && compareTouch.x>-0.5f && compareTouch.y>-0.5f && compareTouch.y < 0.5f)             0000000000
-                    {                                                                                                               00         0
-                        compareTouch = new Vector3(0, 0, 0);                                                                       00
-                    }*/                                                               //                                            00    
-                                                                                    //                                                000000000                                        
-                    /* Vector2 OrgPos = new Vector2(0, 0);                                                                                     00    
-                     if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Stationary)                                              00
-                     {                                                                                                              00         00
-                         OrgPos = Input.GetTouch(0).position;                                                                         000000000
-                     }
-                                                                                                                                      000000000
-                     if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)                                        00       00
-                     {                                                                                                              00
-                         Vector2 MovPos = Input.GetTouch(0).deltaPosition;                                                          00
-                         Vector2 DifferPos = Vector3.Normalize(MovPos - OrgPos);                                                     00       00
-                         if ((DifferPos.x>0 && DifferPos.y>0) && !OnMoving)                                                           000000000
-                             {                                                                                                     
-                             if (OnSideCurve[2] == true || OnInvertCurve[2] == true)                                                00000000000
-                             {                                                                                                      00        00
-                                 //Debug.Log("triggered");                                                                          00         00
-                                 OnMoving = true;                                                                                   00        00
-                                 EnemyMovement();                                                                                   00       00
-                                 StartCoroutine(CurveMov("F", OnSideCurve[2] == true ? "84" : "85"));                               0000000000
-                                 FindMovable();                                                                                     00       00
-                             }                                                                                                      00        00
-                             else if (AbleMovFront[2])
-                             {                                                                                                      000
-                                 StartCoroutine(SmoothMov(2, gameObject));                                                          00 00
-                                                                                                                                    00  00
-                                 FindMovable();                                                                                     00   00
-                                 EnemyMovement();                                                                                   00000000
-                             }                                                                                                      00     00
-                                                                                                                                    00      00
-                         }                                                                                                          00       00
-                         else if ((DifferPos.x < 0 && DifferPos.y < 0) && !OnMoving)                                                00        00
-                         {                                                                                  
-                                                                                                                                    00000000000
-                             if (OnSideCurve[3] == true || OnInvertCurve[3] == true)                                                00         00
-                             {                                                                                                      00          00
-                                 Debug.Log("triggered");                                                                            00         00
-                                 OnMoving = true;                                                                                   00000000000
-                                 EnemyMovement();                                                                                   00
-                                 StartCoroutine(CurveMov("B", OnSideCurve[3] == true ? "84" : "85"));                               00
-                                 FindMovable();                                                                                     00
-                             }                                                                                                      00
-                             else if (AbleMovFront[3])
-                             {
-                                 StartCoroutine(SmoothMov(3, gameObject));
-
-                                 FindMovable();
-                                 EnemyMovement();
-                             }
-                         }
-                         else if (!OnMoving && (DifferPos.x < 0 && DifferPos.y > 0))
-                         {
-                             if (OnSideCurve[1] == true || OnInvertCurve[1] == true)
-                             {
-                                 //Debug.Log("triggered");
-                                 OnMoving = true;
-                                 EnemyMovement();
-                                 StartCoroutine(CurveMov("L", OnSideCurve[1] == true ? "84" : "85"));
-                                 FindMovable();
-                             }
-                             else if (AbleMovFront[1])
-                             {
-                                 StartCoroutine(SmoothMov(1, gameObject));
-
-                                 FindMovable();
-                                 EnemyMovement();
-                             }
-                         }
-                         else if (!OnMoving && (DifferPos.x > 0 && DifferPos.y < 0))
-                         {
-                             if (OnSideCurve[0] == true || OnInvertCurve[0] == true)
-                             {
-                                 Debug.Log("triggered");
-                                 OnMoving = true;
-                                 EnemyMovement();
-                                 StartCoroutine(CurveMov("R", OnSideCurve[0] == true ? "84" : "85"));
-                                 FindMovable();
-                             }
-                             else if (AbleMovFront[0])
-                             {
-                                 StartCoroutine(SmoothMov(0, gameObject));
-
-                                 FindMovable();
-                                 EnemyMovement();
-                             }
-                         }
-                     }*/
-                     
+  
                     Vector3 RangeOfvectors = Input.mousePosition - JoyOrgpos; 
                     Vector3 compareTouch = Vector3.Normalize(RangeOfvectors);
                     if (Mathf.Abs(RangeOfvectors.x) + Mathf.Abs(RangeOfvectors.y) > 20)
@@ -193,6 +114,7 @@ public class Controller : MonoBehaviour {
                             int Switcher = 4;
                             string CurveSide = "";
                             Vector3 CurrentJoy = Vector3.Normalize(JoyButton.transform.position - JoyOrgpos);
+                            #region マップ上プレイヤーを曲がる処理
                             if (CompareValue(CurrentJoy.x, -0.5f, 0.5f) && CompareValue(CurrentJoy.y, 0.5f, 1f))
                             {
                                 if (transform.rotation.eulerAngles.z > 180f)
@@ -206,7 +128,6 @@ public class Controller : MonoBehaviour {
                                     Switcher = 2;
                                     CurveSide = "F";
                                 }
-                                //  Debug.Log("Up");
                             }
                             else if (CompareValue(CurrentJoy.x, -0.5f, 0.5f) && CompareValue(CurrentJoy.y, -1f, -0.5f))
                             {
@@ -220,12 +141,10 @@ public class Controller : MonoBehaviour {
                                     Switcher = 3;
                                     CurveSide = "B";
                                 }
-
-                                // Debug.Log("Down");
+                                
                             }
                             else if (CompareValue(CurrentJoy.x, 0.5f, 1) && CompareValue(CurrentJoy.y, 0.5f, 1f))
                             {
-                                // Debug.Log("Topright");
                                 if (transform.rotation.eulerAngles.x < 180f)
                                 {
                                     Switcher = 2;
@@ -234,7 +153,6 @@ public class Controller : MonoBehaviour {
                             }
                             else if (CompareValue(CurrentJoy.x, -1, -0.5f) && CompareValue(CurrentJoy.y, -1, -0.5f))
                             {
-                                // Debug.Log("bottomleft");
                                 if (transform.rotation.eulerAngles.x < 180f)
                                 {
                                     Switcher = 3;
@@ -243,7 +161,6 @@ public class Controller : MonoBehaviour {
                             }
                             else if (CompareValue(CurrentJoy.x, -1, -0.5f) && CompareValue(CurrentJoy.y, 0.5f, 1))
                             {
-                                //Debug.Log("topleft");
                                 if (transform.rotation.eulerAngles.z < 180)
                                 {
                                     Switcher = 1;
@@ -252,7 +169,6 @@ public class Controller : MonoBehaviour {
                             }
                             else if (CompareValue(CurrentJoy.x, 0.5f, 1) && CompareValue(CurrentJoy.y, -1, -0.5f))
                             {
-                                // Debug.Log("btmright");
                                 if (transform.rotation.eulerAngles.z < 180f)
                                 {
                                     Switcher = 0;
@@ -263,33 +179,26 @@ public class Controller : MonoBehaviour {
                             {
                                 Switcher = 4;
                             }
-                            switch (Switcher)
-                            {
-                                case 0:
-                                case 1:
-                                case 2:
-                                case 3:
-                                    if (OnSideCurve[Switcher] == true || OnInvertCurve[Switcher] == true)
-                                    {
-                                        Debug.Log("triggered");
-                                        OnMoving = true;
-                                        EnemyMovement();
-                                        StartCoroutine(CurveMov(CurveSide, OnSideCurve[Switcher] == true ? "84" : "85"));
-                                        FindMovable();
-                                    }
-                                    else if (AbleMovFront[Switcher])
-                                    {
-                                        StartCoroutine(SmoothMov(Switcher, gameObject));
 
-                                        FindMovable();
-                                        EnemyMovement();
-                                    }
-                                    break;
-                                case 4:
-                                    break;
-                                default:
-                                    break;
+                            if (Switcher < 4)
+                            {
+                                if (OnSideCurve[Switcher] == true || OnInvertCurve[Switcher] == true)
+                                {
+                                    Debug.Log("triggered");
+                                    OnMoving = true;
+                                    EnemyMovement();
+                                    StartCoroutine(CurveMov(CurveSide, OnSideCurve[Switcher] == true ? "84" : "85"));
+                                    FindMovable();
+                                }
+                                else if (AbleMovFront[Switcher])
+                                {
+                                    StartCoroutine(SmoothMov(Switcher, gameObject));
+
+                                    FindMovable();
+                                    EnemyMovement();
+                                }
                             }
+                            #endregion
                         }
                     }
                     else
@@ -303,6 +212,8 @@ public class Controller : MonoBehaviour {
                     JoyButton.transform.position = Vector3.Lerp(JoyButton.transform.position, JoyOrgpos, Time.deltaTime * 10);
                 }
             }
+            #endregion
+            #region ｐｃモード
             else if (SaveFunction.SaveAndLoad.EditMode == true)
             {
                 if (!OnNormMove && !OnMoving && MapLoader.Instance.startMov && (!TextImage[0].activeSelf && !TextImage[1].activeSelf))
@@ -385,7 +296,10 @@ public class Controller : MonoBehaviour {
                     }
                 }
             }
+            #endregion
         }
+        #endregion
+        #region マップの全体を見るモード
         else
         {
             if (SaveFunction.SaveAndLoad.EditMode == false)
@@ -480,29 +394,12 @@ public class Controller : MonoBehaviour {
 
             }
         }
-        
+        #endregion
     }
-    public void onPress()
-    {
-        Joytrigger = true;
-    }
+    
 
-    public void onRelease()
-    {
-        Joytrigger = false;
-    }
-
-    private bool CompareValue(float CompareNum,float min,float max)
-    {
-        if(CompareNum >min && CompareNum< max)
-        {
-            return true;
-        }else
-        {
-            return false;
-        }
-    }
-
+    #region 敵関連処理
+    //敵がダッシュする処理
     IEnumerator EnemyRush()
     {
         enemMoving = true;
@@ -523,7 +420,7 @@ public class Controller : MonoBehaviour {
         enemMoving = false;
         
     }
-
+    //敵を生成する処理
     public void EnemyGenerate()
     {
         for (int i = 0; i < EnemyCount; i++) {
@@ -534,7 +431,7 @@ public class Controller : MonoBehaviour {
             SetEnemy.Add(EnemyCreated);
         }
     }
-
+    //敵の移動
     void EnemyMovement()
     {
         if (!enemMoving && stageNo <3)
@@ -568,7 +465,10 @@ public class Controller : MonoBehaviour {
         }
        
     }
+#endregion
 
+    #region 当たり判定
+    //移動後、レーで当たり判定を更新する
     void FindMovable()
     {
         Vector3 fwd = transform.TransformDirection(Vector3.forward);
@@ -691,7 +591,7 @@ public class Controller : MonoBehaviour {
             Upvector[3] = false;
         }
     }
-
+    //罠の当たり判定
     private void OnTriggerStay(Collider other)
     {
         if (!OnstayTrigger)
@@ -717,6 +617,7 @@ public class Controller : MonoBehaviour {
             }
         }
     }
+    //様々な特殊キューブの当たり判定処理
     private void OnTriggerEnter(Collider other)
     {
         switch (other.tag)
@@ -753,7 +654,6 @@ public class Controller : MonoBehaviour {
                     Debug.Log("12box");
                     if (!EnemyNewMove)
                     {
-                        //MapLoader.Instance.startMov = false;
                         NewMove = true;
                     }
                 }
@@ -777,15 +677,18 @@ public class Controller : MonoBehaviour {
                 GameOver(1);
                 break;
             default:
-                //Debug.Log("got Problem");
                 break;
         }
     }
+    //火の当たり判定
     void OnParticleCollision(GameObject other)
     {
         GameOver(0);
     }
+    #endregion
 
+    #region ギミック
+    //踏んだswitchを地面に沈む処理
     IEnumerator MoveSwitch(Collider other)
     {
         for (int i = 0; i < 10; i++)
@@ -804,7 +707,7 @@ public class Controller : MonoBehaviour {
         if(MapLoader.Instance.Rewind && TempName[1] == "0")
         GetComponent<AudioSource>().Play();
     }
-
+    //踏んだら橋を作る処理
    private void SwitchTrigger(string SwitchName,Collider other)
     {
         string[] SplitName = SwitchName.Split('_');
@@ -824,6 +727,7 @@ public class Controller : MonoBehaviour {
             }
         
     }
+    //転移処理
     private void Teleport(string ColliderName)
     {
         Debug.Log("teleport");
@@ -842,7 +746,7 @@ public class Controller : MonoBehaviour {
         FindMovable();
         StartTeleport = false;
     }
-
+    //爆発処理
     private void Explode(GameObject other)
     {
         if (other.gameObject.layer == 12) { explodecontrol = true; }
@@ -873,7 +777,10 @@ public class Controller : MonoBehaviour {
         Prb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
         
     }
+    #endregion
 
+    #region 移動処理
+    //滑らかの移動処理
     IEnumerator SmoothMov(int Direction,GameObject WhatToMov)
     {
         
@@ -911,11 +818,6 @@ public class Controller : MonoBehaviour {
             a += 0.1f;
             if (i == 9) a = 1;
             
-            /*if(WhatToMov.tag == "Player")
-            {
-                
-                WhatToMov.transform.rotation = Quaternion.Lerp(OrgRot, Quaternion.Euler(RotX,90,RotZ), (i >= 5 ? (1f - a) * 2f:a*2f));
-            }*/
             WhatToMov.transform.position = Vector3.Lerp(OrgPos, NextPos, a);
             yield return new WaitForSeconds(0.01f);
         }
@@ -928,33 +830,7 @@ public class Controller : MonoBehaviour {
         }
         if(Death)ResetSpawn();
     }
-    void ResetSpawn()
-    {
-        Debug.Log("respawn");
-        if (Death)
-        {
-            bool BackPlace = true;
-
-            if (DeathCount == 0)
-            {
-                GameOver(0);
-                BackPlace = false;
-            }
-
-            if (BackPlace)
-            {
-                DeathCount--;
-                Debug.Log(DeathCount);
-                gameObject.transform.position = new Vector3(14, -14, 7);
-                transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
-
-            }
-
-            Death = false;
-            OnstayTrigger = false;
-
-        }
-    }
+    //曲がる移動処理
     IEnumerator CurveMov(string RotateSide,string Tags)
     {
         Debug.Log("ran");
@@ -1024,18 +900,69 @@ public class Controller : MonoBehaviour {
             Teleport(TeleporterName);
         }
     }
+    #endregion
+
+    #region ゲームシステム関連
     void GameOver(int ImageIndex)
     {
         MapLoader.Instance._gameOver = true;
         StartCoroutine(_LoadGameOver(ImageIndex));
     }
+  
+    void ResetSpawn()
+    {
+        Debug.Log("respawn");
+        if (Death)
+        {
+            bool BackPlace = true;
 
+            if (DeathCount == 0)
+            {
+                GameOver(0);
+                BackPlace = false;
+            }
+
+            if (BackPlace)
+            {
+                DeathCount--;
+                Debug.Log(DeathCount);
+                gameObject.transform.position = new Vector3(14, -14, 7);
+                transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+
+            }
+
+            Death = false;
+            OnstayTrigger = false;
+
+        }
+    }
     IEnumerator _LoadGameOver(int _imageIndex)
     {
         yield return new WaitForSeconds(DeadCamTime);
         TextImage[_imageIndex].SetActive(true);
 
     }
+    #endregion
 
-
+    #region その他
+    public void onPress()
+    {
+        Joytrigger = true;
+    }
+    public void onRelease()
+    {
+        Joytrigger = false;
+    }
+    private bool CompareValue(float CompareNum, float min, float max)
+    {
+        if (CompareNum > min && CompareNum < max)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    #endregion
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//崩壊した橋の時間を巻き戻しのエフェクトの処理
 public class ReverseBridge : MonoBehaviour {
     private bool ran = false;
     private Rigidbody rb;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//カメラをマップを見るモードとプレイモードの切り替え処理
 public class SwitchCamMode : MonoBehaviour {
     [System.NonSerialized]
     public Camera cam;
