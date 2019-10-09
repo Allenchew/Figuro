@@ -7,45 +7,57 @@ using UnityEngine.UI;
 
 //作ったマップを保存する
 public class SaveFunction : MonoBehaviour {
+    #region singleton
     public static SaveFunction SaveAndLoad;
 
+    private void Awake()
+    {
+        if (SaveAndLoad == null)
+        {
+            SaveAndLoad = this;
+        }
+        else if (SaveAndLoad != this)
+        {
+            Destroy(SaveAndLoad);
+        }
+    }
+    #endregion
+
+    #region 初期化
     public GameObject FocusMark;
     public GameObject MapNameField;
     public GameObject LoadMapField;
     public InputField MapNm;
     public Dropdown LoadMapSec;
     public Text inputPlace;
-    public string LoadMapName;
     public Text debuglog;
+    public string LoadMapName;
 
     [System.NonSerialized]
-    public bool EditMode =true;
+    public bool EditMode =true; //タブレットモードとｐｃモードの切り替え
 
+    //転移先の座標をセットする
     [System.NonSerialized]
-    public Vector3[] TeleportTarget = new Vector3[]{ new Vector3(23, -13.8f, 25), new Vector3(24, -15.8f, 27),new Vector3(12,-22.8f,18),new Vector3(16,-26.8f,20),new Vector3(10,-26.8f,22),new Vector3(7,-22.8f,18), new Vector3(22, -22, 17)};
+    public Vector3[] TeleportTarget = 
+        new Vector3[]{ new Vector3(23, -13.8f, 25), new Vector3(24, -15.8f, 27),new Vector3(12,-22.8f,18),
+            new Vector3(16,-26.8f,20),new Vector3(10,-26.8f,22),new Vector3(7,-22.8f,18), new Vector3(22, -22, 17)};
 
+    //敵の数を設定する
     [System.NonSerialized]
     public int[] EnemyNum = { 1, 2, 2 };
+
 
     private GameObject TempPos;
     private int LoadCounter = 0;
     private int debugTextCounter = 2;
+    #endregion
 
-    private void Awake()
-    {
-        if(SaveAndLoad == null)
-        {
-            SaveAndLoad = this;
-        }else if( SaveAndLoad != this)
-        {
-            Destroy(SaveAndLoad);
-        }
-    }
-    
+    //マップをロードする
     public void LoadMap()
     {
         if (MapLoader.Instance.EditorTrigger == false)
         {
+            //ステージ数でマップの名前でロードする
             switch (MapLoader.Instance.StagesNum)
             {
                 case 1:
@@ -63,10 +75,11 @@ public class SaveFunction : MonoBehaviour {
 
             }
             LoadFile();
-            
         }
     }
-  
+
+    #region UI関連
+    //マップの入力欄を出す
     public void ActiveMapNameField()
     {
         if (MapNameField.activeSelf == false)
@@ -91,6 +104,29 @@ public class SaveFunction : MonoBehaviour {
             LoadMapSec.ClearOptions();
         }
     }
+    
+    //ロードマップのdropoptionに存在するファイルの名前を導入
+    public void ActiveLoadMap()
+    {
+        if (LoadMapField.activeSelf == false) { LoadMapField.SetActive(true); FocusMark.SetActive(false); }
+        var info = new DirectoryInfo("./Map");
+        var fileinfo = info.GetFiles();
+        List<string> DropOptions = new List<string>();
+        foreach (FileInfo file in fileinfo)
+        {
+            DropOptions.Add(file.Name);
+            Debug.Log(file.Name);
+        }
+        LoadMapSec.AddOptions(DropOptions);
+    }
+    #endregion
+
+    #region　IO関連
+    //マップデータを.dat形式で保存
+    /*マップにあるマップを代表するブロックを一つのgameobjectのしたに置き、
+     * そのobjectの子オブジェクトの座標、回転、タグ、とレイヤーを保存する。
+     *それとプレイヤーの資料も保存し、最後全部のデータを暗号化して、ファイルを作る。
+     */
     public void SaveFile()
     {
         GameObject Plyer = GameObject.FindGameObjectWithTag("Player");
@@ -155,22 +191,14 @@ public class SaveFunction : MonoBehaviour {
         MapNameField.SetActive(false);
         MapNm.text = null;
     }
-
-    public void ActiveLoadMap()
-    {
-        if (LoadMapField.activeSelf == false) { LoadMapField.SetActive(true); FocusMark.SetActive(false); }
-        var info = new DirectoryInfo("./Map");
-        var fileinfo = info.GetFiles();
-        List<string> DropOptions = new List<string>();
-        foreach (FileInfo file in fileinfo) {
-            DropOptions.Add(file.Name);
-            Debug.Log(file.Name);
-        }
-        LoadMapSec.AddOptions(DropOptions);
-    }
+    
+    //マップをロードする
+    /*
+     * ファイルをゲットし、データによってマップロードする
+     */
 	public void LoadFile()
     {
-        //FocusMark.SetActive(true);
+
         TempPos = GameObject.Find("ObjectTempPos");
 
             Save CollectPos = new Save();
@@ -250,7 +278,10 @@ public class SaveFunction : MonoBehaviour {
         LoadMapSec.ClearOptions();
        
     }
+    #endregion
 
+    #region デバッグ用
+    //デバッグ用　（マップデータに入ってるキューブのタイプだけ出力する）
     public void LoggingState(string Logs)
     {
         debuglog.text += Logs + "\n";
@@ -262,6 +293,7 @@ public class SaveFunction : MonoBehaviour {
             debugTextCounter--;
         }
     }
+
     public void LoadBinaryText()
     {
         Save CollectPos = new Save();
@@ -287,4 +319,5 @@ public class SaveFunction : MonoBehaviour {
             i++;
         }
     }
+    #endregion
 }
